@@ -1,0 +1,7 @@
+"0","```r
+```r
+```r
+plot.topicCorr(topicCorr(stm.out))
+```
+```
+```"

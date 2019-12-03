@@ -1,0 +1,9 @@
+"0","```r
+```r
+topic15_docs <- corpus_subset(corpus, topic15_ls)
+
+```
+```"
+"1","Error in corpus_subset.default(corpus, topic15_ls) : 
+  corpus_subset() only works on corpus objects.
+"

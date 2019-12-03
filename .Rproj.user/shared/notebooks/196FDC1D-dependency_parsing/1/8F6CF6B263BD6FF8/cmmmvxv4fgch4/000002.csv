@@ -1,0 +1,4 @@
+"0","setwd(""../saved_Object/"")"
+"2","The working directory was changed to C:/Users/Chi Gao/Documents/UCSD/Fall 2019/research/saved_Object inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks."
+"0","corpus <- readRDS(""corpus.rds"")"
+"0","documentList <- readRDS(""documentList.rds"")"

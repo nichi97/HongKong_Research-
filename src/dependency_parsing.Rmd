@@ -1,0 +1,12 @@
+---
+title: "Dependency Parsing"
+output: html_notebook
+---
+
+```{r}
+#set.seed(10)
+rnorm(1)
+```
+
+
+

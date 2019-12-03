@@ -1,0 +1,13 @@
+"0","```r
+```r
+```r
+stm.out <- readRDS(\stm_16.rds\)
+corpus_df <- as.data.frame(corpus$documents)
+text <- corpus_df$texts
+findThoughts(stm.out, text, topics = 2, n = 100)
+cloud(stm.out, 8)
+findTopic(stm.out, \dalai\, type = \frex\)
+
+```
+```
+```"

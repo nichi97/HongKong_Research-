@@ -1,0 +1,231 @@
+---
+title: "topic_model"
+output: html_notebook
+---
+
+```{r librarys}
+library(quanteda)
+library(tidyverse)
+library(topicmodels)
+library(stm)
+library(lubridate)
+```
+
+
+```{r read in data}
+# read in dfm from dictionary_method_7000_articles
+doc_features <- readRDS("dfm.rds")
+corpus <- readRDS("text_corpus.rds")
+stm.out <- readRDS("stm_16.rds")
+```
+
+```{r create stm model}
+out <- convert(doc_features, to = "stm", docvars = docvars(doc_features))
+stm.out <- stm(out$documents, out$vocab, K=16)
+# saveRDS(stm.out, "stm_16.rds")
+# saveRDS(stm.out, "stm_8.rds")
+  
+```
+
+```{r check out the content in each model}
+# stm.out <- readRDS("stm_8.rds")
+labelTopics(stm.out)
+```
+For the 8_topic model: 
+topic1: music, performance
+topic2: cambodia, Russia
+topic3: ??
+topic4: Food, local
+topic5: book...?
+topic6: book
+topic7: Issue with Tabit
+topic8: company and business
+
+For the 16_topic model:
+
+Topic1: Marriage news
+Topic2: Full text unavailable
+Topic3: Best sellers
+Topic4: Travel, advertisement
+Topic5: FIX THIS! No full text but only links and stuff 2019-05-10 (5)
+Topic6: Art -- music and play
+Topic7: Sport, Olympics
+Topic8: Immigrant, travel, Chinatown
+Topic9: International relationship -- south east Asia, Cambodia 
+Topic10: International relationship -- Soviet Union -> Iraq War, global containment 
+Topic11: Weaponary, machinary
+Topic12: Medicine and education
+Topic13: Index and table of content
+Topic14: Food and recipe
+Topic15: Communist Party issue
+Topic16: Business and trade
+
+
+
+```{r lookinto the meaning of these topics}
+stm.out <- readRDS("stm_16.rds")
+corpus_df <- as.data.frame(corpus$documents)
+text <- corpus_df$texts
+findThoughts(stm.out, text, topics = 2, n = 100)
+cloud(stm.out, 8)
+findTopic(stm.out, "dalai", type = "frex")
+
+```
+
+```{r Visualization of the relationship between topics}
+plot.topicCorr(topicCorr(stm.out))
+```
+
+```{r}
+plot.STM(stm.out)
+```
+
+```{r add in the month}
+dates <- corpus_df$date
+dates <- mdy(dates)
+i_month <- month(dates)
+i_year <- year(dates)
+ym <- 
+  paste(i_year, i_month, "01", sep = "-") %>% 
+  ymd() %>% 
+  as.numeric()
+
+corpus_df <- 
+corpus_df %>% 
+  mutate(ym = ym) 
+
+```
+
+
+
+
+```{r}
+
+prep <- estimateEffect(c(1:16) ~ s(ym), stm.out, corpus_df)
+plot(prep, covariate = "ym", topic = c(1))
+plot.estimateEffect(prep, covariate = "ym", method = "pointestimate")
+```
+
+```{r example}
+out$meta$date <- as.numeric(out$meta$date)
+out$meta$retweeted <- as.numeric(out$meta$retweeted)
+prep <- estimateEffect(c(1:30) ~ retweeted + s(date), stm.out, out$meta)
+plot.estimateEffect(prep, covariate = "retweeted", 
+                    method="difference", cov.value1=1, cov.value2=0)
+findThoughts(stm.out, out$meta$text, topics=18, n=10)
+findThoughts(stm.out, out$meta$text, topics=20, n=10)
+findThoughts(stm.out, out$meta$text, topics=3, n=10)
+findThoughts(stm.out, out$meta$text, topics=16, n=10)
+
+plot.estimateEffect(prep, covariate = "date", 
+                    method="continuous", topic=20)
+```
+
+```{r find the tide of topics associated with each topics}
+stm_theta <- stm.out$theta
+
+# use 0.5 as cutoff to investigate party issue
+topic15_ls <- stm_theta[,15] >= 0.5
+topic15_docs <- corpus_subset(corpus, topic15_ls)
+
+topic15_dates <- 
+  topic15_docs$documents$date
+  
+topic15_month <- 
+mdy(topic15_dates) %>% 
+  month()
+
+topic15_year <- 
+  mdy(topic15_dates) %>%
+  year()
+
+ym <- 
+  paste(topic15_year, topic15_month, "01", sep = "-") %>% 
+  ymd()
+
+ym_table <- table(cut(ym, "month"))
+
+ym_df <- data.frame(Date=names(ym_table), Frequency=as.vector(ym_table))
+
+ym_df <- 
+  ym_df %>% 
+  mutate(Date=ymd(Date))
+
+ggplot(ym_df, aes(Date, Frequency, group = 1)) + 
+  geom_line() + 
+  scale_x_date(limits = c(as.Date("1980-01-01"), NA))
+```
+ 
+```{r sentiment of each topics}
+stm_beta <- stm.out$beta
+beta_mt <- matrix(vc_beta, 16, 327148)
+
+AFINN <- read.csv("./AFINN/AFINN-111.txt", sep = '\t', header = F)
+
+vocab <- 
+  stm.out$vocab
+
+in_vocab_bool <- vocab%in%AFINN$V1
+in_vocab <- vocab[in_vocab_bool]
+
+small_beta <- beta_mt[, in_vocab_bool]
+
+AFINN <- AFINN[AFINN$V1%in%vocab,]
+
+topic_senti <- 
+  small_beta %*% AFINN$V2 / nrow(AFINN)
+
+topic_senti
+```
+
+```{r change in sentiment across time of topic number 15}
+head(stm_theta)
+
+```
+
+```{r load corpus, add date info on them}
+corpus <- readRDS("text_corpus.rds")
+```
+
+
+```{r adding 0,1 to the dates}
+comp_tian <- ifelse(mdy(corpus$documents$date) > tiananmen_time, 1,0 )
+
+corpus$documents <-  
+  corpus$documents %>% 
+  mutate(comp_tian = comp_tian)
+```
+
+```{r do some cleaning}
+# clean all text that is not available 
+corpus_text <- texts(corpus)
+
+corpus_temp <- 
+corpus %>% 
+corpus_trim(what="documents", exclude_pattern="Full text: Not available")
+
+corpus_remove_china <- 
+  corpus_temp %>% 
+  corpus_trim(what="documents", exclude_pattern="china")
+
+corpus_remove_link <- 
+  corpus_remove_china %>% 
+  corpus_trim(what="paragraphs", exclude_pattern="https:")
+
+doc.features <- dfm(corpus_remove_link,
+                    remove=stopwords("english"),
+                    stem=T, remove_punct=T)
+
+corpus_remove_link2 <- corpus_remove_link
+docvars1 <- corpus_remove_link$documents$texts = null
+
+out <- convert(doc.features, to = "stm", docvars = corpus_remove_link$documents)
+
+stm.out <- stm(out$documents, out$vocab, K = 16)
+
+saveRDS(stm.out, "stm16.rds")
+saveRDS(corpus_remove_link, "corpus16.rds")
+
+```
+
+

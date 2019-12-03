@@ -1,0 +1,11 @@
+"0","```r
+```r
+```r
+out <- convert(doc_features, to = \stm\, docvars = docvars(doc_features))
+stm.out <- stm(out$documents, out$vocab, K=16)
+# saveRDS(stm.out, \stm_16.rds\)
+# saveRDS(stm.out, \stm_8.rds\)
+  
+```
+```
+```"

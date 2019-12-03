@@ -1,0 +1,10 @@
+"0","```r
+```r
+```r
+
+prep <- estimateEffect(c(1:16) ~ s(ym), stm.out, corpus_df)
+plot(prep, covariate = \ym\, topic = c(1))
+plot.estimateEffect(prep, covariate = \ym\, method = \pointestimate\)
+```
+```
+```"

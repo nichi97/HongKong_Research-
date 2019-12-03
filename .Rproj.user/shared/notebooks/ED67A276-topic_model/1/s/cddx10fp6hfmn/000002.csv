@@ -1,0 +1,6 @@
+"0","```r
+```r
+# stm.out <- readRDS(\stm_8.rds\)
+labelTopics(stm.out)
+```
+```"

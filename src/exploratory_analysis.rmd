@@ -1,0 +1,56 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+setwd("C://Users//Chi Gao//Documents//UCSD//Fall 2019//research//saved_Object/")
+corpus <- readRDS("./corpus.rds")
+library(tidyverse)
+library(quanteda)
+library(striprtf)
+library(readtext)
+library(textreadr)
+library("quanteda.dictionaries")
+```
+
+
+
+Now let's try dictionary method 
+```{r}
+dictionary_output <- liwcalike(corpus, dictionary = data_dictionary_NRC)
+head(dictionary_output)
+dictionary_output <- 
+dictionary_output %>% 
+  mutate(id = row_number())
+```
+
+Visualize the dictionary method result
+```{r}
+ggplot(dictionary_output, aes(id, anger)) + 
+  geom_point()
+
+```
+
+```{r}
+# convert into dfm
+dfm_data <- dfm(corpus, remove = stopwords("english"), stem = TRUE, remove_punct = TRUE)
+
+```
+
+```{r}
+textplot_wordcloud(dfm_data, min_count = 6, random_order = FALSE,
+                   rotation = .25,
+                   color = RColorBrewer::brewer.pal(8, "Dark2"))
+```
+```{r}
+# name recog
+# dependency parsing 
+# topic models
+```
+```{r}
+summary(corpus)
+```
+

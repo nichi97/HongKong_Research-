@@ -1,0 +1,41 @@
+"0","```r
+```r
+
+# Input: Document in form of character vector
+# output: the sentiment of this document based on AFINN dictionary
+doc2senti <- function(doc){
+ x <- 
+  dfm(doc) %>% 
+  convert(\data.frame\)
+
+sorted_x <- 
+  x[order(colnames(x))] 
+
+sub_vocab_df <- 
+  AFINN[AFINN$V1 %in% colnames(x), ]
+
+sub_vocab_senti <- 
+  sub_vocab_df$V2
+
+sub_vocab <- sub_vocab_df$V1
+
+
+sub_x <- 
+  sorted_x[, colnames(sorted_x)%in%sub_vocab]
+
+if(typeof(sub_x) != \double\ && ncol(sub_x) == 0){
+  return(NA)
+}
+
+
+sum_senti <- as.matrix(sub_x) %*% as.matrix(sub_vocab_senti)
+
+# only counting the words that used in AFINN 
+doc_len <- sum(sub_x)
+senti <- sum_senti / doc_len
+senti
+
+
+}
+```
+```"

@@ -1,0 +1,6 @@
+"0","dictionary_output <- 
+dictionary_output %>% 
+  mutate(id = row_number)
+"
+"2","Error: Column `id` is of unsupported type function
+"

@@ -1,0 +1,29 @@
+---
+title: "Dependency Parsing"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+library(quanteda)
+library(stm)
+```
+
+
+
+```{r}
+setwd("../saved_Object/")
+corpus <- readRDS("corpus.rds")
+documentList <- readRDS("documentList.rds")
+```
+
+Try out topic model
+```{r}
+# create the dfm 
+dfm_nyt <- dfm(corpus, remove_punct=TRUE, remove=stopwords("english"))
+out <- convert(dfm_nyt, to="stm", docvars = docvars(dfm_nyt))
+stm_out <- stm(out$documents, out$vocab, K=10)
+
+```
+
+
+

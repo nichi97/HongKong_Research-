@@ -1,0 +1,18 @@
+"0","```r
+```r
+```r
+out$meta$date <- as.numeric(out$meta$date)
+out$meta$retweeted <- as.numeric(out$meta$retweeted)
+prep <- estimateEffect(c(1:30) ~ retweeted + s(date), stm.out, out$meta)
+plot.estimateEffect(prep, covariate = \retweeted\, 
+                    method=\difference\, cov.value1=1, cov.value2=0)
+findThoughts(stm.out, out$meta$text, topics=18, n=10)
+findThoughts(stm.out, out$meta$text, topics=20, n=10)
+findThoughts(stm.out, out$meta$text, topics=3, n=10)
+findThoughts(stm.out, out$meta$text, topics=16, n=10)
+
+plot.estimateEffect(prep, covariate = \date\, 
+                    method=\continuous\, topic=20)
+```
+```
+```"

@@ -1,0 +1,7 @@
+"0","```r
+# read in dfm from dictionary_method_7000_articles
+doc_features <- readRDS(\"dfm.rds\")corpus <- readRDS(\"text_corpus.rds\")
+
+```"
+"1","Error: unexpected symbol in \"doc_features <- readRDS(\"dfm.rds\")corpus\"
+"
