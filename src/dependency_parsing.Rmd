@@ -6,6 +6,7 @@ output: html_notebook
 library(tidyverse)
 library(quanteda)
 library(stm)
+library(wordcloud)
 ```
 
 
@@ -22,8 +23,59 @@ Try out topic model
 dfm_nyt <- dfm(corpus, remove_punct=TRUE, remove=stopwords("english"))
 out <- convert(dfm_nyt, to="stm", docvars = docvars(dfm_nyt))
 stm_out <- stm(out$documents, out$vocab, K=10)
-
+saveRDS(stm_out, "../saved_Object/stm_out.rds")
 ```
 
+
+```{r}
+# look into meaning of topics
+corpus_df <- as.data.frame(corpus$documents)
+text <- corpus_df$texts
+findThoughts(stm_out, text, topic = 7, n=3 )
+
+# look into meaning of topics
+labelTopics(stm_out)
+
+# plot
+plot.STM(stm_out)
+
+# cloud
+cloud(stm_out, 4)
+
+# find keyword in each topics
+str_view(as.character(thoughts), "Hong")
+```
+
+Topic 4: American Politics
+Topic 7
+Topic 5
+Topic 8
+Topic 6
+Topic 3
+Topic 10
+Topic 9
+Topic 2
+Topic 1
+
+Check how the word "Hong Kong" is used in each topics
+```{r}
+stm_theta <- stm_out$theta
+
+TOPIC_NUM = 10
+
+# number of prevelent article in each topic
+ls_prevelent_article <- list()
+ls_prevelent_article_date <- list()
+
+topic6_ls <- stm_theta[,6] >= 0.5
+topic6_docs <- corpus_subset(corpus, topic6_ls)
+
+for(i in 1:TOPIC_NUM){
+  topic_ls <- stm_theta[,i] >= 0.5
+  topic_docs <- corpus_subset(corpus, topic_ls)
+  ls_prevelent_article <-  append(ls_prevelent_article, topic_docs$documents)
+}
+
+```
 
 
